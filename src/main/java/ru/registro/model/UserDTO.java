@@ -17,7 +17,7 @@ public class UserDTO {
     @ApiModelProperty(value = "Номер телефона")
     private String phone;
 
-    @ApiModelProperty(value = "Пол", allowableValues = "m,f")
+    @ApiModelProperty(value = "Пол", allowableValues = "M,F")
     private Sex sex;
 
     @ApiModelProperty(value = "Дата рождения")
