@@ -26,7 +26,7 @@ public class EntryService {
 
             User user;
 
-            if (userDTO.getId() != null && userRepository.getOne(userDTO.getId()) != null) {
+            if (userDTO.getId() != null && userRepository.findById(userDTO.getId()).isPresent()) {
                 user = userRepository.getOne(userDTO.getId());
             } else {
                 user = new User();
@@ -42,11 +42,12 @@ public class EntryService {
                     .filter(fieldDTO -> !(fieldDTO.getName() == null || fieldDTO.getName().isEmpty() ||
                             fieldDTO.getValue() == null || fieldDTO.getValue().isEmpty()))
                     .forEach(fieldDTO -> {
-                        Field field = fieldRepository.findByName(fieldDTO.getName());
+                        Field field = fieldRepository.findByUserIdAndName(user.getId(), fieldDTO.getName());
                         if (field == null) {
                             field = new Field();
                             field.setName(fieldDTO.getName());
                             field.setForm(form);
+                            field.setUser(user);
                         }
 
                         field.setValue(fieldDTO.getValue());

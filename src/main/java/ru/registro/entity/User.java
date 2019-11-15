@@ -24,7 +24,7 @@ public class User {
 
     private String sex;
 
-    private Date birthday;
+    private Long birthday;
 
     private String city;
 
@@ -71,11 +71,11 @@ public class User {
         this.sex = sex;
     }
 
-    public Date getBirthday() {
+    public Long getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(Long birthday) {
         this.birthday = birthday;
     }
 

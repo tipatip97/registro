@@ -1,5 +1,7 @@
 package ru.registro.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 public class UserDTO {
@@ -13,7 +15,7 @@ public class UserDTO {
 
     private Sex sex;
 
-    private Date birthday;
+    private Long birthday;
 
     private String city;
 
@@ -59,11 +61,11 @@ public class UserDTO {
         this.sex = sex;
     }
 
-    public Date getBirthday() {
+    public Long getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(Long birthday) {
         this.birthday = birthday;
     }
 
