@@ -14,9 +14,10 @@ public class MainController {
 
     @RequestMapping(path = "add", method = RequestMethod.POST)
     public EntryResponse addEntry(
-            @RequestBody
-            EntryRequest request) {
-        return entryService.addEntry(request);
+            @RequestBody EntryRequest request,
+            @RequestParam String form
+            ) {
+        return entryService.addEntry(request, form);
     }
 
 

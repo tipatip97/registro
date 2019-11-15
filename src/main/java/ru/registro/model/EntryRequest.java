@@ -1,11 +1,14 @@
 package ru.registro.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class EntryRequest {
+    @JsonProperty("user")
     private UserDTO userDTO;
+
     private List<FieldDTO> fields;
-    private String form;
 
     public UserDTO getUserDTO() {
         return userDTO;
@@ -21,13 +24,5 @@ public class EntryRequest {
 
     public void setFields(List<FieldDTO> fields) {
         this.fields = fields;
-    }
-
-    public String getForm() {
-        return form;
-    }
-
-    public void setForm(String form) {
-        this.form = form;
     }
 }
