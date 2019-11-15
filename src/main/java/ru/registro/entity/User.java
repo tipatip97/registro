@@ -1,6 +1,9 @@
 package ru.registro.entity;
 
+import ru.registro.model.UserDTO;
+
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table
@@ -18,6 +21,15 @@ public class User {
 
     @Column
     private String phone;
+
+    private String sex;
+
+    private Date birthday;
+
+    private String city;
+
+    private String church;
+
 
     public Long getId() {
         return id;
@@ -49,5 +61,61 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getChurch() {
+        return church;
+    }
+
+    public void setChurch(String church) {
+        this.church = church;
+    }
+
+    public void fillNotNullFields(UserDTO userDTO) {
+        if (userDTO.getName() != null) {
+            name = userDTO.getName();
+        }
+        if (userDTO.getLastName() != null) {
+            lastName = userDTO.getLastName();
+        }
+        if (userDTO.getPhone() != null) {
+            phone = userDTO.getPhone();
+        }
+        if (userDTO.getSex() != null) {
+            sex = userDTO.getSex().toString();
+        }
+        if (userDTO.getBirthday() != null) {
+            birthday = userDTO.getBirthday();
+        }
+        if (userDTO.getCity() != null) {
+            city = userDTO.getCity();
+        }
+        if (userDTO.getChurch() != null) {
+            church = userDTO.getChurch();
+        }
     }
 }

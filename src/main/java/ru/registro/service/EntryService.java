@@ -32,17 +32,7 @@ public class EntryService {
                 user = new User();
             }
 
-            if (userDTO.getName() != null) {
-                user.setName(userDTO.getName());
-            }
-
-            if (userDTO.getLastName() != null) {
-                user.setLastName(userDTO.getLastName());
-            }
-
-            if (userDTO.getPhone() != null) {
-                user.setPhone(userDTO.getPhone());
-            }
+            user.fillNotNullFields(userDTO);
 
             response.setUserId(
                     userRepository.saveAndFlush(user).getId());

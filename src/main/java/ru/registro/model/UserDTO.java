@@ -1,5 +1,7 @@
 package ru.registro.model;
 
+import java.util.Date;
+
 public class UserDTO {
     private Long id;
 
@@ -8,6 +10,14 @@ public class UserDTO {
     private String lastName;
 
     private String phone;
+
+    private Sex sex;
+
+    private Date birthday;
+
+    private String city;
+
+    private String church;
 
     public Long getId() {
         return id;
@@ -39,5 +49,37 @@ public class UserDTO {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public void setSex(Sex sex) {
+        this.sex = sex;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getChurch() {
+        return church;
+    }
+
+    public void setChurch(String church) {
+        this.church = church;
     }
 }
