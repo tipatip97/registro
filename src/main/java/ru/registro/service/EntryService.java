@@ -25,15 +25,24 @@ public class EntryService {
         if (userDTO != null) {
 
             User user;
+
             if (userDTO.getId() != null && userRepository.getOne(userDTO.getId()) != null) {
                 user = userRepository.getOne(userDTO.getId());
             } else {
                 user = new User();
             }
 
-            user.setName(userDTO.getName());
-            user.setLastName(userDTO.getLastName());
-            user.setPhone(userDTO.getPhone());
+            if (userDTO.getName() != null) {
+                user.setName(userDTO.getName());
+            }
+
+            if (userDTO.getLastName() != null) {
+                user.setLastName(userDTO.getLastName());
+            }
+
+            if (userDTO.getPhone() != null) {
+                user.setPhone(userDTO.getPhone());
+            }
 
             response.setUserId(
                     userRepository.saveAndFlush(user).getId());
@@ -47,10 +56,10 @@ public class EntryService {
                         if (field == null) {
                             field = new Field();
                             field.setName(fieldDTO.getName());
+                            field.setForm(form);
                         }
 
                         field.setValue(fieldDTO.getValue());
-                        field.setForm(form);
 
                         fieldRepository.saveAndFlush(field);
                     });
