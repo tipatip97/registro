@@ -39,15 +39,16 @@ public class EntryService {
                     userRepository.saveAndFlush(user).getId());
 
             request.getFields()
+                    .stream()
+                    .filter(fieldDTO -> !(fieldDTO.getName() == null || fieldDTO.getName().isEmpty() ||
+                            fieldDTO.getValue() == null || fieldDTO.getValue().isEmpty()))
                     .forEach(fieldDTO -> {
-                        Field field;
-                        if (fieldDTO.getId() != null && fieldRepository.getOne(fieldDTO.getId()) != null) {
-                            field = fieldRepository.getOne(fieldDTO.getId());
-                        } else {
+                        Field field = fieldRepository.findByName(fieldDTO.getName());
+                        if (field == null) {
                             field = new Field();
+                            field.setName(fieldDTO.getName());
                         }
 
-                        field.setName(fieldDTO.getName());
                         field.setValue(fieldDTO.getValue());
                         field.setForm(form);
 
