@@ -10,7 +10,7 @@ import ru.registro.service.EntryService;
 
 @RestController
 @RequestMapping("/")
-public class MainController {
+public class EntryController {
     @Autowired
     private EntryService entryService;
 
