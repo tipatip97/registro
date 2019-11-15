@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("User")
 public class UserDTO {
     @ApiModelProperty(value = "ID пользователя. Если заполнен - другие поля можно перезаписать")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "Имя")
     private String name;
@@ -29,11 +29,11 @@ public class UserDTO {
     @ApiModelProperty(value = "Церковь")
     private String church;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -1,17 +1,18 @@
 package ru.registro.entity;
 
+import org.hibernate.annotations.GenericGenerator;
 import ru.registro.model.UserDTO;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table
 public class User {
     @Id
     @Column
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    private String id;
 
     @Column
     private String name;
@@ -31,11 +32,11 @@ public class User {
     private String church;
 
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
