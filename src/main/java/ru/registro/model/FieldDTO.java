@@ -1,10 +1,14 @@
 package ru.registro.model;
 
-import javax.persistence.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
+@ApiModel("Field")
 public class FieldDTO {
+    @ApiModelProperty(value = "Название поля")
     private String name;
 
+    @ApiModelProperty(value = "Содрежимое поля")
     private String value;
 
     public String getName() {

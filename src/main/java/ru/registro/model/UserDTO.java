@@ -1,24 +1,32 @@
 package ru.registro.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-import java.util.Date;
-
+@ApiModel("User")
 public class UserDTO {
+    @ApiModelProperty(value = "ID пользователя. Если заполнен - другие поля можно перезаписать")
     private Long id;
 
+    @ApiModelProperty(value = "Имя")
     private String name;
 
+    @ApiModelProperty(value = "Фамилия")
     private String lastName;
 
+    @ApiModelProperty(value = "Номер телефона")
     private String phone;
 
+    @ApiModelProperty(value = "Пол", allowableValues = "m,f")
     private Sex sex;
 
+    @ApiModelProperty(value = "Дата рождения")
     private Long birthday;
 
+    @ApiModelProperty(value = "Город")
     private String city;
 
+    @ApiModelProperty(value = "Церковь")
     private String church;
 
     public Long getId() {

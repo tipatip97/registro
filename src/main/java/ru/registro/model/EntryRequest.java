@@ -1,13 +1,16 @@
 package ru.registro.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
 
 public class EntryRequest {
     @JsonProperty("user")
+    @ApiModelProperty("Всякая конфиденциальная информация")
     private UserDTO userDTO;
 
+    @ApiModelProperty(value = "Дополнительные поля")
     private List<FieldDTO> fields;
 
     public UserDTO getUserDTO() {
