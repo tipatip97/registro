@@ -19,7 +19,7 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("ru.krtech.dialogm.bot.controller"))
+                .apis(RequestHandlerSelectors.basePackage("ru.registro.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }
