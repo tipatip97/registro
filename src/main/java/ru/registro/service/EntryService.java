@@ -17,7 +17,7 @@ public class EntryService {
     @Autowired
     private FieldRepository fieldRepository;
 
-    public EntryResponse addEntry(EntryRequest request) {
+    public EntryResponse addEntry(EntryRequest request, String form) {
         EntryResponse response = new EntryResponse();
 
         UserDTO userDTO = request.getUserDTO();
@@ -49,7 +49,7 @@ public class EntryService {
 
                         field.setName(fieldDTO.getName());
                         field.setValue(fieldDTO.getValue());
-                        field.setForm(request.getForm());
+                        field.setForm(form);
 
                         fieldRepository.saveAndFlush(field);
                     });
