@@ -3,7 +3,7 @@ import './Registro.scss';
 import Registration from "./registration/registration";
 
 function Registro() {
-  return <Registration />;
+  return <Registration/>;
 }
 
 export default Registro;

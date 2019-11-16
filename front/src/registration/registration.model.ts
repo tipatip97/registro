@@ -16,6 +16,7 @@ export interface RegisterField {
     reg: RegExp,
     type: RegisterFieldType,
     value: string,
+    errMessage: string,
 }
 
 export enum RegisterFieldType {
