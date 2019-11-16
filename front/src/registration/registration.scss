@@ -1,0 +1,28 @@
+
+.registration-page {
+
+  > .field {
+
+    > .label-wrapper {
+      position: relative;
+
+      > .field-input {
+
+        + .date-picker {
+          position: absolute;
+          right: 0;
+          top: 25px;
+          display: none;
+          opacity:0;
+          z-index: 1;
+        }
+
+        &.focused + .date-picker {
+          display: block;
+          opacity: 1;
+          transition: opacity ease .5s;
+        }
+      }
+    }
+  }
+}

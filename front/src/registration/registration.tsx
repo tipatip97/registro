@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import {RegisterField, RegisterFieldType, RegistrationResponse, RegistrationResponseField} from "./registration.model";
 import {UserInfo, UserInfoField} from "../Registro.model";
 import {RegistroService} from "../Registro.service";
+import './registration.scss';
+import DatePicker from "../tools/date-picker/date-picker";
 
 export default function Registration() {
 
@@ -102,17 +104,31 @@ export default function Registration() {
     const test = field.type === RegisterFieldType.ndate ? !isNaN(registroService.convertNDate(val) as number) : field.reg.test(val);
     setErrorMessage(test ? '' : field.errMessage);
   };
+  let datePickerInputTarget: any;
 
   return (
-    <div>{
+    <div className="registration-page">{
       userFields.map((field, fieldi) => {
         return (
-          <div key={`main-${fieldi}`}>
-            <label>
-              <span>{field.title}</span>
-              <input defaultValue={field.value}
+          <div className="field" key={`registration-page-field-${fieldi}`}>
+            <label className="label-wrapper">
+              <span className="field-title">{field.title}</span>
+              <input className="field-input"
+                     defaultValue={field.value}
                      onInput={(e: any) => field.value = e.target.value}
+                     onFocus={e => {
+                       datePickerInputTarget = field.type === RegisterFieldType.ndate ? e.target : null;
+                       e.target.classList.add('focused');
+                     }}
                      onBlur={e => validate(e.target.value, field)}/>
+              {
+                field.type === RegisterFieldType.ndate ? <DatePicker onValueChange={date => {
+                  datePickerInputTarget.value = registroService.convertNDate(date, 'string', 'ru');
+                  datePickerInputTarget.blur();
+                  datePickerInputTarget.classList.remove('focused');
+                }
+                }/>: null
+              }
             </label>
           </div>
         );

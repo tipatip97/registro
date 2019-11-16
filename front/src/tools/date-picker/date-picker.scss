@@ -1,0 +1,46 @@
+.date-picker {
+  background-color: white;
+  border: solid 1px #eee;
+  border-radius: 3px;
+
+  > .dp-line {
+
+    > .dp-cell {
+      --box-size: 30px;
+      display: inline-flex;
+      width: var(--box-size);
+      height: var(--box-size);
+      text-align: center;
+      align-items: center;
+      border-radius: 3px;
+
+      &.weekend {
+        color: #c40000;
+      }
+
+      &:not(.unselectable):not(.header) {
+        cursor: pointer;
+
+        &.current {
+          font-weight: bold;
+        }
+
+        &:hover {
+          background-color: #ccc;
+        }
+      }
+
+      > .text {
+        margin: auto;
+      }
+    }
+
+    &.header {
+      pointer-events: none;
+    }
+  }
+}
+
+.error-init-data-message {
+  color: red;
+}
