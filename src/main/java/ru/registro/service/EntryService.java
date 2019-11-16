@@ -25,31 +25,32 @@ public class EntryService {
         if (userDTO != null) {
 
             User user;
-            if (userDTO.getId() != null && userRepository.getOne(userDTO.getId()) != null) {
+
+            if (userDTO.getId() != null && userRepository.findById(userDTO.getId()).isPresent()) {
                 user = userRepository.getOne(userDTO.getId());
             } else {
                 user = new User();
             }
 
-            user.setName(userDTO.getName());
-            user.setLastName(userDTO.getLastName());
-            user.setPhone(userDTO.getPhone());
+            user.fillNotNullFields(userDTO);
 
             response.setUserId(
                     userRepository.saveAndFlush(user).getId());
 
             request.getFields()
+                    .stream()
+                    .filter(fieldDTO -> !(fieldDTO.getName() == null || fieldDTO.getName().isEmpty() ||
+                            fieldDTO.getValue() == null || fieldDTO.getValue().isEmpty()))
                     .forEach(fieldDTO -> {
-                        Field field;
-                        if (fieldDTO.getId() != null && fieldRepository.getOne(fieldDTO.getId()) != null) {
-                            field = fieldRepository.getOne(fieldDTO.getId());
-                        } else {
+                        Field field = fieldRepository.findByUserIdAndName(user.getId(), fieldDTO.getName());
+                        if (field == null) {
                             field = new Field();
+                            field.setName(fieldDTO.getName());
+                            field.setForm(form);
+                            field.setUser(user);
                         }
 
-                        field.setName(fieldDTO.getName());
                         field.setValue(fieldDTO.getValue());
-                        field.setForm(form);
 
                         fieldRepository.saveAndFlush(field);
                     });

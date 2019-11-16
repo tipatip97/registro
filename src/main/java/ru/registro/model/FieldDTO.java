@@ -1,21 +1,15 @@
 package ru.registro.model;
 
-import javax.persistence.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
+@ApiModel("Field")
 public class FieldDTO {
-    private Long id;
-
+    @ApiModelProperty(value = "Название поля")
     private String name;
 
+    @ApiModelProperty(value = "Содрежимое поля")
     private String value;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

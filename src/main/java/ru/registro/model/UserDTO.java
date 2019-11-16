@@ -1,19 +1,39 @@
 package ru.registro.model;
 
-public class UserDTO {
-    private Long id;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
+@ApiModel("User")
+public class UserDTO {
+    @ApiModelProperty(value = "ID пользователя. Если заполнен - другие поля можно перезаписать")
+    private String id;
+
+    @ApiModelProperty(value = "Имя")
     private String name;
 
+    @ApiModelProperty(value = "Фамилия")
     private String lastName;
 
+    @ApiModelProperty(value = "Номер телефона")
     private String phone;
 
-    public Long getId() {
+    @ApiModelProperty(value = "Пол", allowableValues = "M,F")
+    private Sex sex;
+
+    @ApiModelProperty(value = "Дата рождения")
+    private Long birthday;
+
+    @ApiModelProperty(value = "Город")
+    private String city;
+
+    @ApiModelProperty(value = "Церковь")
+    private String church;
+
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -39,5 +59,37 @@ public class UserDTO {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public void setSex(Sex sex) {
+        this.sex = sex;
+    }
+
+    public Long getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Long birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getChurch() {
+        return church;
+    }
+
+    public void setChurch(String church) {
+        this.church = church;
     }
 }
