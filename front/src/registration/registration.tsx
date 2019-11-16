@@ -1,12 +1,10 @@
 import React, {useState} from 'react';
-import {RegistrationService} from "./registration.service";
 import {RegisterField, RegisterFieldType, RegistrationResponse, RegistrationResponseField} from "./registration.model";
 import {UserInfo, UserInfoField} from "../Registro.model";
 import {RegistroService} from "../Registro.service";
 
-export function Registration() {
+export default function Registration() {
 
-    const service = new RegistrationService();
     const registroService = new RegistroService();
 
     const lsName = 'user-fields';
@@ -84,7 +82,7 @@ export function Registration() {
     const saveData = () => {
         const user = {} as UserInfo;
         const fields: RegistrationResponseField[] = [];
-        userFields.forEach(({name, value, type, reg}) => {
+        userFields.forEach(({name, value, type}) => {
             // @ts-ignore
             user[name] = type === RegisterFieldType.ndate ? registroService.convertNDate(value) : value;
         });
@@ -119,5 +117,3 @@ export function Registration() {
         </div>
     );
 }
-
-export default Registration;
