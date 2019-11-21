@@ -1,18 +1,36 @@
 .date-picker {
-  background-color: white;
-  border: solid 1px #eee;
+  --box-size: 30px;
+  --blocks-on-vertical: 9;
+  --border-size: 1px;
+
+  background-color: #fff;
+  border: solid var(--border-size) #eee;
   border-radius: 3px;
+  user-select: none;
+  min-height: calc(var(--box-size) * var(--blocks-on-vertical) + var(--blocks-on-vertical) * (var(--border-size) * 2));
 
   > .dp-line {
 
+    &:hover {
+      background-color: #eee;
+    }
+
+    &.year {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: var(--box-size);
+    }
+
     > .dp-cell {
-      --box-size: 30px;
       display: inline-flex;
       width: var(--box-size);
       height: var(--box-size);
       text-align: center;
       align-items: center;
+      vertical-align: top;
       border-radius: 3px;
+      border: solid 1px #0000;
 
       &.weekend {
         color: #c40000;
@@ -21,8 +39,12 @@
       &:not(.unselectable):not(.header) {
         cursor: pointer;
 
-        &.current {
+        &.today {
           font-weight: bold;
+        }
+
+        &.current {
+          border-color: #4200d133;
         }
 
         &:hover {

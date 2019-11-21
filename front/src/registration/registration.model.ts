@@ -15,7 +15,7 @@ export interface RegisterField {
     name: UserInfoField,
     reg: RegExp,
     type: RegisterFieldType,
-    value: string,
+    value: string | number | null,
     errMessage: string,
 }
 
