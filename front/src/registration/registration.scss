@@ -1,36 +1,142 @@
 
 .registration-page {
+  --field-v-padding: 20px;
+  --field-h-padding: 20px;
+  --tech-v-margin: 5px;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  background-color: #7db08b;
+
+  & > .field, > .footer {
+    width: 700px;
+    max-width: calc(90vw - 10px);
+    min-width: 50vw;
+    margin: 10px auto;
+  }
 
   > .field {
-    position: static;
+    position: relative;
+    padding: var(--field-v-padding) var(--field-h-padding);
+    background-color: #fff;
+    border-radius: 5px;
+    border: 1px solid #ffff;
+    box-sizing: border-box;
 
-    > .label-wrapper.date {
-      position: relative;
+    &.above {
       z-index: 100;
+    }
+
+    &.invalid {
+      background-color: #ffcfcf;
+      border-color: red;
 
       > .field-input {
-
-        + .date-picker {
-          position: absolute;
-          right: 0;
-          top: 25px;
-        }
-
-        &.focused + .date-picker {
-          display: block;
-          opacity: 1;
-          transition: opacity ease .5s;
-        }
+        border-bottom-color: red !important;
       }
     }
 
-    >.paranja.active {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #eee1;
+    > * {
+
+      margin: var(--tech-v-margin) 0;
     }
+
+    > .title {
+      font-weight: bold;
+    }
+
+    > .description {
+      color: #aaa;
+      font-size: .9em;
+    }
+
+    > .variant {
+
+      > .radio-button {
+        --size: 1em;
+
+        display:inline-block;
+        width: var(--size);
+        max-width: var(--size);
+        min-width: var(--size);
+        height: var(--size);
+        max-height: var(--size);
+        min-height: var(--size);
+        border-radius: var(--size);
+        border: solid 3px #3e6916;
+        vertical-align: middle;
+        box-sizing: border-box;
+
+        &.checked {
+          background-color: #7db08b;
+        }
+      }
+
+      > .title {
+        vertical-align: middle;
+        margin-left: 10px;
+      }
+    }
+
+    > .field-input {
+      max-width: 100%;
+      min-width: 50%;
+      border: none;
+      outline: none;
+      border-bottom: 1px solid #ccc;
+      transition: border-bottom-color .7s ease;
+      background-color: transparent;
+
+      &:focus {
+        border-bottom-color: #7db08b;
+      }
+
+      + .date-picker {
+        position: absolute;
+        left: var(--field-h-padding);
+        top: calc(100% - var(--field-v-padding));
+      }
+
+      &.focused + .date-picker {
+        display: block;
+        opacity: 1;
+        transition: opacity ease .5s;
+      }
+    }
+  }
+
+  > .footer {
+
+    > .save-button {
+      border: none;
+      border-radius: 3px;
+      outline: none;
+      background-color: #3e6916;
+      color: #fff;
+      padding: 10px;
+      cursor: pointer;
+
+      &:disabled {
+        filter: brightness(.7);
+        cursor: default;
+      }
+    }
+  }
+
+  > .paranja.active {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #eee1;
   }
 }

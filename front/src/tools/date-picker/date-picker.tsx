@@ -144,8 +144,8 @@ export default function DatePicker(config: DatePickerConfig) {
   const thisMonth = today.getMonth();
   const thisYear = today.getFullYear();
 
-  if (config.config != null) {
-    config.config.updateDate = (date: number | string | null) => setCurrentTime(firstState = update(date));
+  if (config.callbacks != null) {
+    config.callbacks.updateDate = (date: number | string | null) => setCurrentTime(firstState = update(date));
   }
 
   // const initDate = new Date(initDay - (ms + sec * 1000 + min * 60000 + hours * 3600000));

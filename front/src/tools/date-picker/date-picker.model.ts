@@ -3,7 +3,7 @@ export interface DatePickerConfig {
   init?: number | string,
   onValueChange?(date: number): void,
   onInit?(date: number): void,
-  config?: DatePickerUserConfig,
+  callbacks?: DatePickerUserConfig,
 }
 
 export interface DatePickerUserConfig {

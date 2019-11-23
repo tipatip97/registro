@@ -8,83 +8,137 @@ import {DatePickerUserConfig} from "../tools/date-picker/date-picker.model";
 
 export default function Registration() {
 
-  let [errorMessage, setErrorMessage] = useState('');
   let [datePickerInputTarget, setDatePickerInputTarget] = useState<any>(null);
   let [birthdayTime, setBirthdayTime] = useState<number | null>();
+  let [, setTimestamp] = useState(0);
 
-  const validate = (val: string, field: RegisterField) => {
-    const test = field.type === RegisterFieldType.ndate ? field.reg.test(val) && !isNaN(registroService.convertNDate(val, 'number') as number) : field.reg.test(val);
-    setErrorMessage(test ? '' : field.errMessage);
-    return test;
+  const datePickerCallbacks: DatePickerUserConfig = {};
+  const regKey = nestKey('registration-page');
+  const rerender = () => setTimestamp(Date.now());
+  const validateValue = (field: RegisterField, val?: string) => {
+    rerender();
+    return validate(field, val);
   };
 
-  const datePickerConfig: DatePickerUserConfig = {};
+
+  const saveData = () => {
+    userFields.forEach(field => validate(field));
+    if (invalidFields.getLength() === 0) {
+      const user = {} as UserInfo;
+      const fields: RegistrationResponseField[] = [];
+      userFields.forEach(({name, value, type}) => {
+        // @ts-ignore
+        user[name] = type === RegisterFieldType.ndate ? registroService.convertNDate(value, 'number') : value;
+      });
+      const regData = {user, fields};
+      localStorage[lsName] = JSON.stringify(regData);
+      // service.sendRegData(regData).then();
+    } else {
+      rerender();
+      navigator.vibrate && navigator.vibrate([100]);
+    }
+  };
 
   return (
     <div className="registration-page">{
       userFields.map((field, fieldi) => {
-        return (
-          <div className="field" key={`registration-page-field-${fieldi}`}>
-            <label className={`label-wrapper${field.type === RegisterFieldType.ndate ? ' date' : ''}`}>
-              <span className="field-title">{field.title}</span>
-              <input className="field-input"
-                     defaultValue={field.value || ''}
-                     onInput={(e: any) => {
-                       if (field.type === RegisterFieldType.ndate) {
-                         const val = registroService.convertNDate(e.target.value, 'number') as number;
+        const isAbove = field.type === RegisterFieldType.ndate && datePickerInputTarget;
+        const userFieldKey = nestKey('field', fieldi, regKey);
 
-                         if (!isNaN(val)) {
-                           datePickerConfig.updateDate && datePickerConfig.updateDate(val);
-                           field.value = val;
-                         }
-                       } else field.value = e.target.value;
-                     }}
-                     onKeyUp={(e: any) => {
-                       if (field.type === RegisterFieldType.ndate) {
-                         if (e.keyCode === 13) {
-                           const val = registroService.convertNDate(e.target.value, 'string', 'ru');
-                           if (val) {
-                             field.value = e.target.value = val;
-                             setDatePickerInputTarget(null);
+        return (
+          <div className={`field${isAbove ? ' above' : ''}${invalidFields[field.name] ? ' invalid' : ''}`}
+               key={userFieldKey}>
+            <div className="title">{field.title}</div>
+            <div className="description">{field.description}</div>
+            {
+              field.type === RegisterFieldType.radio ?
+                field.variants && field.variants.map((variant, varianti) => {
+                  const ufVarKey = nestKey('variant', varianti, userFieldKey);
+
+                  return (
+                    <div className="variant"
+                         key={ufVarKey}
+                         onClick={() => {
+                           field.value = variant.value;
+                           rerender();
+                         }}>
+                      <span className={`radio-button${field.value === variant.value ? ' checked' : ''}`}> </span>
+                      <span className={`title`}>{variant.title}</span>
+                    </div>
+                  );
+                }) :
+                <><input className="field-input"
+                         autoComplete="off"
+                         defaultValue={field.value || ''}
+                         onInput={(e: any) => {
+                           if (invalidFields[field.name]) {
+                             validateValue(field, e.target.value);
+                             rerender();
+                           } else if (field.type === RegisterFieldType.ndate) {
+                             const val = registroService.convertNDate(e.target.value, 'number') as number;
+
+                             if (!isNaN(val)) {
+                               datePickerCallbacks.updateDate && datePickerCallbacks.updateDate(val);
+                               field.value = val;
+                             }
+                           } else field.value = e.target.value;
+                         }}
+                         onKeyUp={(e: any) => {
+                           if (field.type === RegisterFieldType.ndate) {
+                             if (e.keyCode === 13) {
+                               const val = registroService.convertNDate(e.target.value, 'string', 'ru');
+                               if (val) {
+                                 field.value = e.target.value = val;
+                                 setDatePickerInputTarget(null);
+                               }
+                             } else if (e.keyCode === 40) setDatePickerInputTarget(e.target);
+                             else if (e.keyCode === 27) setDatePickerInputTarget(null);
+                             else if (datePickerInputTarget == null) setDatePickerInputTarget(e.target);
                            }
-                         } else if (e.keyCode === 40) setDatePickerInputTarget(e.target);
-                         else if (e.keyCode === 27) setDatePickerInputTarget(null);
-                         else if (datePickerInputTarget == null) setDatePickerInputTarget(e.target);
-                       }
-                     }}
-                     onFocus={e => {
-                       setDatePickerInputTarget(field.type === RegisterFieldType.ndate ? e.target : null);
-                       if (field.type === RegisterFieldType.ndate) {
-                       }
-                     }}
-                     onBlur={e => {
-                       const test = validate(e.target.value, field);
-                       if (test) field.value = field.type === RegisterFieldType.ndate ? registroService.convertNDate(e.target.value, 'string', 'ru') : e.target.value;
-                     }}/>
-              {
-                field.type === RegisterFieldType.ndate && datePickerInputTarget ?
-                  <DatePicker init={birthdayTime || field.value || '-20y'}
-                              config={datePickerConfig}
-                              onInit={date => setTimeout(() => datePickerInputTarget.value = registroService.convertNDate(date, 'string', 'ru'))}
-                              onValueChange={date => {
-                                setBirthdayTime(date);
-                                datePickerInputTarget.value = registroService.convertNDate(date, 'string', 'ru');
-                                field.value = date;
-                                datePickerInputTarget.blur();
-                                setDatePickerInputTarget(null);
-                              }}/> :
-                  null
-              }
-            </label>
-            <div className={`paranja${datePickerInputTarget != null ? ' active' : ''}`}
-                 onClick={() => setDatePickerInputTarget(null)}>{}</div>
+                         }}
+                         onFocus={e => {
+                           setDatePickerInputTarget(field.type === RegisterFieldType.ndate ? e.target : null);
+                           if (field.type === RegisterFieldType.ndate) {
+                           }
+                         }}
+                         onBlur={e => {
+                           const test = validateValue(field, e.target.value);
+                           if (test) field.value = field.type === RegisterFieldType.ndate ? registroService.convertNDate(e.target.value, 'string', 'ru') : e.target.value;
+                         }}/>
+                  {
+                    field.type === RegisterFieldType.ndate && datePickerInputTarget ?
+                      <DatePicker key={nestKey('date-picker', fieldi, userFieldKey)}
+                                  init={birthdayTime || field.value || '-20y'}
+                                  callbacks={datePickerCallbacks}
+                                  onInit={date => setTimeout(() => {
+                                    datePickerInputTarget.value = registroService.convertNDate(date, 'string', 'ru');
+                                  })}
+                                  onValueChange={date => {
+                                    setBirthdayTime(date);
+                                    datePickerInputTarget.value = registroService.convertNDate(date, 'string', 'ru');
+                                    field.value = date;
+                                    datePickerInputTarget.blur();
+                                    setDatePickerInputTarget(null);
+                                  }}/> :
+                      null
+                  }
+                  {invalidFields[field.name] ? <div
+                    className="error-message">{invalidFields[field.name] || 'Ошибка введённых данных'}</div> : null}</>
+
+            }
           </div>
         );
       })
-    }{errorMessage ? <div className="error-message">{errorMessage}</div> : null}
-      <button onClick={saveData}
-              disabled={errorMessage !== ''}>Сохранить данные локально
-      </button>
+    }
+      <div className="footer">
+        <button className="save-button"
+                onClick={saveData}
+                onMouseOver={e => e}
+                disabled={invalidFields.getLength() > 0}>Сохранить данные локально
+        </button>
+      </div>
+      <div className={`paranja${datePickerInputTarget != null ? ' active' : ''}`}
+           onClick={() => setDatePickerInputTarget(null)}>{}</div>
     </div>
   );
 }
@@ -94,42 +148,38 @@ const registroService = new RegistroService();
 
 const lsName = 'user-fields';
 
+const invalidFields: { [name: string]: string | Function, getLength(): number } = {
+  getLength: function () {
+    return Object.keys(this).length - 1;
+  }
+};
+
 const userFields: RegisterField[] = [
-  {
-    title: 'Имя',
-    name: UserInfoField.name,
-    reg: /^[А-ЯЁ][-а-яё]+$/,
-    type: RegisterFieldType.text,
-    errMessage: 'Поле "Имя" должно быть одним словом, начинающееся с больной буквы. допускается использование знака тире.',
-    value: '',
-  },
   {
     title: 'Фамилия',
     name: UserInfoField.lastName,
+    description: 'Например: Иванов',
+    required: true,
     reg: /^[А-ЯЁ][-а-яё]+$/,
     type: RegisterFieldType.text,
     errMessage: 'Поле "Фамилия" должно быть одним словом, начинающееся с больной буквы. допускается использование знака тире.',
     value: '',
   },
   {
-    title: 'Церковь',
-    name: UserInfoField.church,
-    reg: /^[а-яё][-а-яё ,]+$/i,
+    title: 'Имя',
+    name: UserInfoField.name,
+    description: 'Например: Иван',
+    required: false,
+    reg: /^[А-ЯЁ][-а-яё]+$/,
     type: RegisterFieldType.text,
-    errMessage: 'Поле "Церковь" заполнено неправильно. Значение должно состоять из букв, тире, запятых и может состоять из нескольких слов. Всё остальное не допустимо.',
-    value: ''
-  },
-  {
-    title: 'Телефон',
-    name: UserInfoField.phone,
-    reg: /^\d{11,15}$/i,
-    type: RegisterFieldType.text,
-    errMessage: 'Номер телефона должен состоять только из цифр в количестве от 11 до 15',
+    errMessage: 'Поле "Имя" должно быть одним словом, начинающееся с больной буквы. допускается использование знака тире.',
     value: '',
   },
   {
     title: 'Дата рождения',
     name: UserInfoField.birthday,
+    description: '',
+    required: true,
     reg: /^(\d{1,2})([./])(\d{1,2})\2(\d{2}|\d{4})$/,
     type: RegisterFieldType.ndate,
     errMessage: 'Неверная дата',
@@ -138,17 +188,51 @@ const userFields: RegisterField[] = [
   {
     title: 'Пол',
     name: UserInfoField.sex,
-    reg: /^[mf]$/i,
-    type: RegisterFieldType.text,
+    description: '',
+    required: true,
+    reg: /^[mw]$/i,
+    type: RegisterFieldType.radio,
+    variants: [
+      {
+        title: 'М',
+        value: 'm',
+      }, {
+        title: 'Ж',
+        value: 'w',
+      }
+    ],
+    default: '',
     errMessage: 'Поле "Пол" не верно введено',
     value: '',
   },
   {
     title: 'Город',
     name: UserInfoField.city,
+    description: 'Например: Симферополь',
+    required: true,
     reg: /^[а-я][-а-я ,()]+$/i,
     type: RegisterFieldType.text,
     errMessage: 'Значение поля "Город" может содержать только буквы, знак запятой, знак тире и может состоять из нескольких слов для уточнения информации в круглых скобках.',
+    value: '',
+  },
+  {
+    title: 'Церковь',
+    name: UserInfoField.church,
+    description: 'Например: Святой Троицы, ЕХБ',
+    required: true,
+    reg: /^[а-яё][-а-яё ,]+$/i,
+    type: RegisterFieldType.text,
+    errMessage: 'Поле "Церковь" заполнено неправильно. Значение должно состоять из букв, тире, запятых и может состоять из нескольких слов. Всё остальное не допустимо.',
+    value: ''
+  },
+  {
+    title: 'Телефон',
+    name: UserInfoField.phone,
+    description: 'Например: +79123456789',
+    required: true,
+    reg: /^\d{11,15}$/i,
+    type: RegisterFieldType.text,
+    errMessage: 'Номер телефона должен состоять только из цифр в количестве от 11 до 15',
     value: '',
   },
 ];
@@ -169,15 +253,33 @@ userFields.forEach(field => {
   }
 });
 
-const saveData = () => {
-  const user = {} as UserInfo;
-  const fields: RegistrationResponseField[] = [];
-  userFields.forEach(({name, value, type}) => {
-    // @ts-ignore
-    user[name] = type === RegisterFieldType.ndate ? registroService.convertNDate(value, 'number') : value;
-  });
-  const regData = {user, fields};
-  localStorage[lsName] = JSON.stringify(regData);
-  // service.sendRegData(regData).then();
-};
 
+// const cl = (r: any) => {
+//   console.log(r);
+//   return r;
+// };
+const nestKey = (name: string, unique?: number, prev?: string) => `${prev == null ? '' : `${prev}.`}${name}${unique == null ? '' : `:${unique}`}`;
+
+
+const validate = (field: RegisterField, val?: string) => {
+  let test = true;
+  if (val == '') {
+    if (field.required) {
+      invalidFields[field.name] = 'Обязательное поле';
+      test = false;
+    } else if (invalidFields[field.name]) {
+      delete invalidFields[field.name];
+    }
+  } else {
+    const value = val || (field.value || '').toString();
+    test = field.type === RegisterFieldType.ndate ? field.reg.test(value) && !isNaN(registroService.convertNDate(value, 'number') as number) : field.reg.test(value);
+    if (test) {
+      if (invalidFields[field.name]) {
+        delete invalidFields[field.name];
+      }
+    } else {
+      invalidFields[field.name] = field.errMessage;
+    }
+  }
+  return test;
+};
