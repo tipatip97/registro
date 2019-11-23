@@ -60,6 +60,7 @@ export default function Registration() {
                          key={ufVarKey}
                          onClick={() => {
                            field.value = variant.value;
+                           validateValue(field, variant.value);
                            rerender();
                          }}>
                       <span className={`radio-button${field.value === variant.value ? ' checked' : ''}`}> </span>
@@ -177,7 +178,7 @@ const userFields: RegisterField[] = [
     title: 'Имя',
     name: UserInfoField.name,
     description: 'Например: Иван',
-    required: false,
+    required: true,
     reg: /^[А-ЯЁ][-а-яё]+$/,
     type: RegisterFieldType.text,
     errMessage: 'Поле "Имя" должно быть одним словом, начинающееся с больной буквы. допускается использование знака тире.',
@@ -236,7 +237,7 @@ const userFields: RegisterField[] = [
   {
     title: 'Телефон',
     name: UserInfoField.phone,
-    description: 'Например: +79123456789',
+    description: 'Например: 79123456789',
     required: true,
     reg: /^\+?\d{11,15}$/i,
     type: RegisterFieldType.text,
