@@ -230,7 +230,7 @@ const userFields: RegisterField[] = [
     name: UserInfoField.phone,
     description: 'Например: +79123456789',
     required: true,
-    reg: /^\d{11,15}$/i,
+    reg: /^\+?\d{11,15}$/i,
     type: RegisterFieldType.text,
     errMessage: 'Номер телефона должен состоять только из цифр в количестве от 11 до 15',
     value: '',
@@ -263,7 +263,7 @@ const nestKey = (name: string, unique?: number, prev?: string) => `${prev == nul
 
 const validate = (field: RegisterField, val?: string) => {
   let test = true;
-  if (val == '') {
+  if (val === '') {
     if (field.required) {
       invalidFields[field.name] = 'Обязательное поле';
       test = false;
