@@ -1,13 +1,16 @@
 
 export interface DatePickerConfig {
   init?: number | string,
-  onValueChange?(date: number): void,
-  onInit?(date: number): void,
+  onValueChange?(ts: number): void,
+  onCandidateChange?(ts: number): void,
+  onBlur?(ts: number): void,
+  onInit?(ts: number): void,
   callbacks?: DatePickerUserConfig,
 }
 
 export interface DatePickerUserConfig {
   updateDate?(date: number | string | null): void,
+  focus?(): void,
 }
 
 export interface WeekDay {
@@ -22,5 +25,5 @@ export interface CurrentTime {
   year: number,
   day: number,
   month: number,
-  ms: number,
+  ts: number,
 }
