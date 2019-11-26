@@ -42,7 +42,7 @@ export default function Registration(config: RegistrationConfig) {
   };
 
   return (
-    <div className="registration-page">{
+    <div className="registration-page-component">{
       userFields.map((field, fieldi) => {
         const isAbove = field.type === FieldType.ndate && datePickerInputTarget;
         const userFieldKey = nestKey('field', fieldi, regKey);
@@ -254,7 +254,7 @@ const validate = (field: RegisterField, val: string | number | null) => {
       invalidFields[field.name] = 'Обязательное поле';
       test = false;
     } else delete invalidFields[field.name];
-  } else {
+  } else if (field.reg != null) {
     const value = (val || '').toString();
     test = field.reg.test(value);
     if (test) {
