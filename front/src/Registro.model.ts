@@ -1,17 +1,6 @@
 
 
-export interface UserInfo {
-    id: number,
-    name: string,
-    lastName: string,
-    phone: string,
-    birthday: number,
-    sex: 'm' | 'f',
-    city: string,
-    church: string,
-}
-
-export enum UserInfoField {
+export enum UserInfoFieldName {
     id = 'id',
     name = 'name',
     lastName = 'lastName',
@@ -20,4 +9,15 @@ export enum UserInfoField {
     sex = 'sex',
     city = 'city',
     church = 'church',
+}
+
+export interface UserInfo {
+    [UserInfoFieldName.id]: number,
+    [UserInfoFieldName.name]: string,
+    [UserInfoFieldName.lastName]: string,
+    [UserInfoFieldName.phone]: string,
+    [UserInfoFieldName.birthday]: number,
+    [UserInfoFieldName.sex]: 'm' | 'f',
+    [UserInfoFieldName.city]: string,
+    [UserInfoFieldName.church]: string,
 }

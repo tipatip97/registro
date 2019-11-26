@@ -1,16 +1,17 @@
 import React, {useState} from 'react';
-import {RegisterField, RegisterFieldType, RegistrationResponse, RegistrationResponseField} from "./registration.model";
-import {UserInfo, UserInfoField} from "../Registro.model";
+import {FieldType, RegisterField, RegistrationConfig} from "./registration.model";
+import {UserInfo, UserInfoFieldName} from "../Registro.model";
 import {RegistroService} from "../Registro.service";
 import './registration.scss';
 import DatePicker from "../tools/date-picker/date-picker";
 import {DatePickerUserConfig} from "../tools/date-picker/date-picker.model";
 
-export default function Registration() {
+export default function Registration(config: RegistrationConfig) {
 
   let [datePickerInputTarget, setDatePickerInputTarget] = useState<any>(null);
   let [birthdayTime, setBirthdayTime] = useState<number | null>();
   let [, setTimestamp] = useState(0);
+  let [userInfo, setUserInfo] = useState<UserInfo>(config.userInfo || {});
 
   const datePickerCallbacks: DatePickerUserConfig = {};
   const regKey = nestKey('registration-page');
@@ -21,17 +22,11 @@ export default function Registration() {
   };
 
 
-  const saveData = () => {
-    userFields.forEach(field => validate(field, field.value));
+  const saveUserData = () => {
+    userFields.forEach(field => validate(field, userInfo[field.name]));
     if (invalidFields.getLength() === 0) {
-      const user = {} as UserInfo;
-      const fields: RegistrationResponseField[] = [];
-      userFields.forEach(({name, value, type}) => {
-        // @ts-ignore
-        user[name] = type === RegisterFieldType.ndate ? registroService.convertNDate(value, 'number') : value;
-      });
-      const regData = {user, fields};
-      localStorage[lsName] = JSON.stringify(regData);
+
+      if (config.onUserInfoSave) config.onUserInfoSave(userInfo);
       // service.sendRegData(regData).then();
     } else {
       rerender();
@@ -39,10 +34,17 @@ export default function Registration() {
     }
   };
 
+  const setUserValue = (name: UserInfoFieldName, val: any) => {
+    const info: any = {};
+    Object.keys(userInfo).forEach((name: string) => info[name] = userInfo[name as UserInfoFieldName]);
+    info[name] = val;
+    setUserInfo(info);
+  };
+
   return (
     <div className="registration-page">{
       userFields.map((field, fieldi) => {
-        const isAbove = field.type === RegisterFieldType.ndate && datePickerInputTarget;
+        const isAbove = field.type === FieldType.ndate && datePickerInputTarget;
         const userFieldKey = nestKey('field', fieldi, regKey);
 
         return (
@@ -51,7 +53,7 @@ export default function Registration() {
             <div className="title">{field.title}</div>
             <div className="description">{field.description}</div>
             {
-              field.type === RegisterFieldType.radio ?
+              field.type === FieldType.radio ?
                 field.variants && field.variants.map((variant, varianti) => {
                   const ufVarKey = nestKey('variant', varianti, userFieldKey);
 
@@ -59,37 +61,37 @@ export default function Registration() {
                     <div className="variant"
                          key={ufVarKey}
                          onClick={() => {
-                           field.value = variant.value;
+                           setUserValue(field.name, variant.value);
                            validateValue(field, variant.value);
                            rerender();
                          }}>
-                      <span className={`radio-button${field.value === variant.value ? ' checked' : ''}`}> </span>
+                      <span className={`radio-button${userInfo[field.name] === variant.value ? ' checked' : ''}`}> </span>
                       <span className={`title`}>{variant.title}</span>
                     </div>
                   );
                 }) :
                 <><input className="field-input"
                          autoComplete="off"
-                         defaultValue={field.value || ''}
+                         defaultValue={field.type === FieldType.ndate ? registroService.convertNDate(userInfo[field.name], 'string', 'ru') as string : userInfo[field.name] || ''}
                          onInput={(e: any) => {
                            if (invalidFields[field.name]) {
                              validateValue(field, e.target.value);
                              rerender();
-                           } else if (field.type === RegisterFieldType.ndate) {
+                           } else if (field.type === FieldType.ndate) {
                              const val = registroService.convertNDate(e.target.value, 'number') as number;
 
                              if (!isNaN(val)) {
                                datePickerCallbacks.updateDate && datePickerCallbacks.updateDate(val);
-                               field.value = val;
+                               setUserValue(field.name, val);
                              }
-                           } else field.value = e.target.value;
+                           } else setUserValue(field.name, e.target.value);
                          }}
                          onKeyUp={(e: any) => {
-                           if (field.type === RegisterFieldType.ndate) {
+                           if (field.type === FieldType.ndate) {
                              if (e.keyCode === 13) {
-                               const val = getNDateAsString(e.tagret.value);
+                               const val = getNDateAsString(e.target.value);
                                if (val) {
-                                 field.value = e.target.value = val;
+                                 setUserValue(field.name, e.target.value = val);
                                  setDatePickerInputTarget(null);
                                }
                              } else if (e.keyCode === 40) {
@@ -100,18 +102,16 @@ export default function Registration() {
                            }
                          }}
                          onFocus={e => {
-                           setDatePickerInputTarget(field.type === RegisterFieldType.ndate ? e.target : null);
-                           if (field.type === RegisterFieldType.ndate) {
-                           }
+                           setDatePickerInputTarget(field.type === FieldType.ndate ? e.target : null);
                          }}
                          onBlur={e => {
                            const test = validateValue(field, e.target.value);
-                           if (test) field.value = field.type === RegisterFieldType.ndate ? getNDateAsString(e.target.value) : e.target.value;
+                           if (test) setUserValue(field.name, field.type === FieldType.ndate ? getNDateAsString(e.target.value) : e.target.value);
                          }}/>
                   {
-                    field.type === RegisterFieldType.ndate && datePickerInputTarget ?
+                    field.type === FieldType.ndate && datePickerInputTarget ?
                       <DatePicker key={nestKey('date-picker', fieldi, userFieldKey)}
-                                  init={birthdayTime || field.value || '-20y'}
+                                  init={birthdayTime || userInfo[field.name] || '-20y'}
                                   callbacks={datePickerCallbacks}
                                   onInit={ts => setTimeout(() => {
                                     datePickerInputTarget.value = getNDateAsString(ts);
@@ -125,7 +125,7 @@ export default function Registration() {
                                   onValueChange={ts => {
                                     setBirthdayTime(ts);
                                     datePickerInputTarget.value = getNDateAsString(ts);
-                                    field.value = ts;
+                                    setUserValue(field.name, ts);
                                     datePickerInputTarget.focus();
                                     setDatePickerInputTarget(null);
                                   }}/> :
@@ -141,7 +141,7 @@ export default function Registration() {
     }
       <div className="footer">
         <button className="save-button"
-                onClick={saveData}
+                onClick={saveUserData}
                 onMouseOver={e => e}
                 disabled={invalidFields.getLength() > 0}>Сохранить данные локально
         </button>
@@ -152,10 +152,7 @@ export default function Registration() {
   );
 }
 
-
 const registroService = new RegistroService();
-
-const lsName = 'user-fields';
 
 const invalidFields: { [name: string]: string | Function, getLength(): number } = {
   getLength: function () {
@@ -166,105 +163,83 @@ const invalidFields: { [name: string]: string | Function, getLength(): number } 
 const userFields: RegisterField[] = [
   {
     title: 'Фамилия',
-    name: UserInfoField.lastName,
+    name: UserInfoFieldName.lastName,
     description: 'Например: Иванов',
     required: true,
     reg: /^[А-ЯЁ][-а-яё]+$/,
-    type: RegisterFieldType.text,
+    type: FieldType.string,
     errMessage: 'Поле "Фамилия" должно быть одним словом, начинающееся с больной буквы. допускается использование знака тире.',
-    value: '',
   },
   {
     title: 'Имя',
-    name: UserInfoField.name,
+    name: UserInfoFieldName.name,
     description: 'Например: Иван',
     required: true,
     reg: /^[А-ЯЁ][-а-яё]+$/,
-    type: RegisterFieldType.text,
+    type: FieldType.string,
     errMessage: 'Поле "Имя" должно быть одним словом, начинающееся с больной буквы. допускается использование знака тире.',
-    value: '',
   },
   {
     title: 'Дата рождения',
-    name: UserInfoField.birthday,
+    name: UserInfoFieldName.birthday,
     description: '',
     required: true,
     reg: /^(\d{1,2})([./])(\d{1,2})\2(\d{2}|\d{4})$/,
-    type: RegisterFieldType.ndate,
+    type: FieldType.ndate,
     errMessage: 'Неверная дата',
-    value: '',
   },
   {
     title: 'Пол',
-    name: UserInfoField.sex,
+    name: UserInfoFieldName.sex,
     description: '',
     required: true,
     reg: /^[mw]$/i,
-    type: RegisterFieldType.radio,
+    type: FieldType.radio,
     variants: [
       {
         title: 'М',
         value: 'm',
+        type: FieldType.string
       }, {
         title: 'Ж',
         value: 'w',
+        type: FieldType.string
       }
     ],
     default: '',
     errMessage: 'Поле "Пол" не верно введено',
-    value: '',
   },
   {
     title: 'Город',
-    name: UserInfoField.city,
+    name: UserInfoFieldName.city,
     description: 'Например: Симферополь',
     required: true,
     reg: /^[а-я][-а-я ,()]+$/i,
-    type: RegisterFieldType.text,
+    type: FieldType.string,
     errMessage: 'Значение поля "Город" может содержать только буквы, знак запятой, знак тире и может состоять из нескольких слов для уточнения информации в круглых скобках.',
-    value: '',
   },
   {
     title: 'Церковь',
-    name: UserInfoField.church,
+    name: UserInfoFieldName.church,
     description: 'Например: Святой Троицы, ЕХБ',
     required: true,
     reg: /^[а-яё][-а-яё ,]+$/i,
-    type: RegisterFieldType.text,
+    type: FieldType.string,
     errMessage: 'Поле "Церковь" заполнено неправильно. Значение должно состоять из букв, тире, запятых и может состоять из нескольких слов. Всё остальное не допустимо.',
-    value: ''
   },
   {
     title: 'Телефон',
-    name: UserInfoField.phone,
+    name: UserInfoFieldName.phone,
     description: 'Например: 79123456789',
     required: true,
     reg: /^\+?\d{11,15}$/i,
-    type: RegisterFieldType.text,
+    type: FieldType.string,
     errMessage: 'Номер телефона должен состоять только из цифр в количестве от 11 до 15',
-    value: '',
   },
 ];
 
-const locRegData: RegistrationResponse = JSON.parse(localStorage[lsName] || '{"fields":[],"user":{}}');
 const getNDateAsString = (val: number | string): string => registroService.convertNDate(val, 'string', 'ru') as string;
 const nestKey = (name: string, unique?: number, prev?: string) => `${prev == null ? '' : `${prev}.`}${name}${unique == null ? '' : `:${unique}`}`;
-
-
-locRegData.fields.forEach((lsField: RegistrationResponseField) => {
-  const field = userFields.find(f => f.name === lsField.name);
-  if (field != null) {
-    field.value = lsField.value;
-  }
-});
-
-userFields.forEach(field => {
-  const val = locRegData.user[field.name];
-  if (val != null) {
-    field.value = field.type === RegisterFieldType.ndate ? getNDateAsString(val) : val.toString();
-  }
-});
-
 
 // const cl = (r: any) => {
 //   console.log(r);
@@ -281,7 +256,7 @@ const validate = (field: RegisterField, val: string | number | null) => {
     } else delete invalidFields[field.name];
   } else {
     const value = (val || '').toString();
-    test = field.type === RegisterFieldType.ndate ? field.reg.test(value) && !isNaN(registroService.convertNDate(value, 'number') as number) : field.reg.test(value);
+    test = field.reg.test(value);
     if (test) {
       delete invalidFields[field.name];
     } else {
