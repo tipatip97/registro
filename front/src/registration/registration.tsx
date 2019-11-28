@@ -5,6 +5,7 @@ import {RegistroService} from "../Registro.service";
 import './registration.scss';
 import DatePicker from "../tools/date-picker/date-picker";
 import {DatePickerUserConfig} from "../tools/date-picker/date-picker.model";
+import {nestKey} from "../utils";
 
 export default function Registration(config: RegistrationConfig) {
 
@@ -23,7 +24,7 @@ export default function Registration(config: RegistrationConfig) {
 
 
   const saveUserData = () => {
-    userFields.forEach(field => validate(field, userInfo[field.name]));
+    userFields.forEach(field => validate(field, userInfo[field.name] || ''));
     if (invalidFields.getLength() === 0) {
 
       if (config.onUserInfoSave) config.onUserInfoSave(userInfo);
@@ -42,7 +43,7 @@ export default function Registration(config: RegistrationConfig) {
   };
 
   return (
-    <div className="registration-page-component">{
+    <div className="registration-page-component app-component">{
       userFields.map((field, fieldi) => {
         const isAbove = field.type === FieldType.ndate && datePickerInputTarget;
         const userFieldKey = nestKey('field', fieldi, regKey);
@@ -59,14 +60,17 @@ export default function Registration(config: RegistrationConfig) {
 
                   return (
                     <div className="variant"
-                         key={ufVarKey}
-                         onClick={() => {
-                           setUserValue(field.name, variant.value);
-                           validateValue(field, variant.value);
-                           rerender();
-                         }}>
-                      <span className={`radio-button${userInfo[field.name] === variant.value ? ' checked' : ''}`}> </span>
+                         key={ufVarKey}>
+                      <span className={'variant-cursor'}
+                            onClick={() => {
+                              setUserValue(field.name, variant.value);
+                              validateValue(field, variant.value);
+                              rerender();
+                            }}>
+                      <span
+                        className={`radio-button${userInfo[field.name] === variant.value ? ' checked' : ''}`}> </span>
                       <span className={`title`}>{variant.title}</span>
+                      </span>
                     </div>
                   );
                 }) :
@@ -130,11 +134,10 @@ export default function Registration(config: RegistrationConfig) {
                                     setDatePickerInputTarget(null);
                                   }}/> :
                       null
-                  }
-                  {invalidFields[field.name] ? <div
-                    className="error-message">{invalidFields[field.name] || 'Ошибка введённых данных'}</div> : null}</>
-
+                  }</>
             }
+            {invalidFields[field.name] ? <div
+              className="error-message">{invalidFields[field.name] || 'Ошибка введённых данных'}</div> : null}
           </div>
         );
       })
@@ -168,7 +171,7 @@ const userFields: RegisterField[] = [
     required: true,
     reg: /^[А-ЯЁ][-а-яё]+$/,
     type: FieldType.string,
-    errMessage: 'Поле "Фамилия" должно быть одним словом, начинающееся с больной буквы. допускается использование знака тире.',
+    errMessage: 'Поле "Фамилия" должно быть одним словом, начинающимся с больной буквы. допускается использование знака тире.',
   },
   {
     title: 'Имя',
@@ -177,7 +180,7 @@ const userFields: RegisterField[] = [
     required: true,
     reg: /^[А-ЯЁ][-а-яё]+$/,
     type: FieldType.string,
-    errMessage: 'Поле "Имя" должно быть одним словом, начинающееся с больной буквы. допускается использование знака тире.',
+    errMessage: 'Поле "Имя" должно быть одним словом, начинающимся с больной буквы. допускается использование знака тире.',
   },
   {
     title: 'Дата рождения',
@@ -230,7 +233,7 @@ const userFields: RegisterField[] = [
   {
     title: 'Телефон',
     name: UserInfoFieldName.phone,
-    description: 'Например: 79123456789',
+    description: 'Например: +79123456789',
     required: true,
     reg: /^\+?\d{11,15}$/i,
     type: FieldType.string,
@@ -239,7 +242,6 @@ const userFields: RegisterField[] = [
 ];
 
 const getNDateAsString = (val: number | string): string => registroService.convertNDate(val, 'string', 'ru') as string;
-const nestKey = (name: string, unique?: number, prev?: string) => `${prev == null ? '' : `${prev}.`}${name}${unique == null ? '' : `:${unique}`}`;
 
 // const cl = (r: any) => {
 //   console.log(r);
@@ -249,6 +251,7 @@ const nestKey = (name: string, unique?: number, prev?: string) => `${prev == nul
 
 const validate = (field: RegisterField, val: string | number | null) => {
   let test = true;
+
   if (val === '') {
     if (field.required) {
       invalidFields[field.name] = 'Обязательное поле';

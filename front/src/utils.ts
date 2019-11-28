@@ -18,3 +18,4 @@ export class UserInfoApplicator {
   // }
 }
 
+export const nestKey = (name: string, unique?: number, prev?: string) => `${prev == null ? '' : `${prev}.`}${name}${unique == null ? '' : `:${unique}`}`;
