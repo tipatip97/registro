@@ -6,4 +6,30 @@
     background-color: #fff;
     padding: 20px;
   }
+
+  > .our-meetings {
+    margin: 20px 0;
+
+    > .title {
+      background-color: #aaa;
+      padding: 10px;
+    }
+
+    > .meeting-list {
+      margin-left: 30px;
+
+      > .meeting {
+        display: inline-block;
+        background-color: yellow;
+
+        > .title {
+          font-weight: bold;
+        }
+
+        > .description {
+
+        }
+      }
+    }
+  }
 }

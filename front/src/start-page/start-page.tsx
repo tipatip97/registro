@@ -11,14 +11,23 @@ export default function StartPage(config: StartPageConfig) {
 
   return (
     <div className={'start-page-component app-component'}>
-      <div className={'header'}>Hello, {config.userInfo[UserInfoFieldName.name]}</div>
-      <div>{
-        meetings.map((meeting, meetingi) => {
-          const meetingKey = nestKey('meeting', meetingi, startKey);
+      <div className={'header'}>Привет, {config.userInfo[UserInfoFieldName.name]}</div>
+      <div className={`our-meetings`}>
+        <div className={`title`}>Наши ближайшие мероприятия:</div>
+        <div className={`meeting-list`}>{
+          meetings.map((meeting, meetingi) => {
+            const meetingKey = nestKey('meeting', meetingi, startKey);
 
-          return <div key={meetingKey}>{meeting.title}</div>;
-        })
-      }</div>
+            return (
+              <div className={`meeting`}
+                   key={meetingKey}>
+                <div className={`title`}>{meeting.title}</div>
+                <div className={`description`}>{meeting.description}</div>
+              </div>
+            );
+          })
+        }</div>
+      </div>
     </div>
   );
 }
